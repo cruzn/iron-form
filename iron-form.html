@@ -263,6 +263,7 @@ attach it to the `<iron-form>`:
         var elements = this._getValidatableElements();
 
         this.scrollOffset = null;
+        var first = true;
 
         // Go through all the elements, and validate the custom ones.
         for (var el, i = 0; el = elements[i], i < elements.length; i++) {
@@ -272,12 +273,22 @@ attach it to the `<iron-form>`:
           if (validatable.validate) {
             var isValid = validatable.validate()
             valid = !!isValid && valid;
-            if(!isValid){
-              this.scrollOffset = this.scrollOffset == null ? validatable.offsetTop : (this.scrollOffset > validatable.offsetTop ? validatable.offsetTop : this.scrollOffset);
+            if(!isValid && first){
+               first =  false;
+               this.scrollOffset = this.getYPosition(validatable) - validatable.offsetHeight;
             }
           }
         }
         return valid;
+      },
+
+      getYPosition: function(element) {
+        var yPosition = 0;
+        while(element) {
+            yPosition += (element.offsetTop - element.scrollTop + element.clientTop);
+            element = element.offsetParent;
+        }
+        return yPosition;
       },
 
       /**
